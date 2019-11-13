@@ -6,10 +6,13 @@ import (
 )
 
 type Location struct {
-	ID       string `db:"id" json:"identifier"`
-	Province string `db:"province" json:"province"`
-	District string `db:"district" json:"district"`
-	Canton   string `db:"canton" json:"canton"`
+	ID         string `db:"id_location" json:"id_location"`
+	IDProvince string `db:"id_province" json:"id_province"`
+	IDDistrict string `db:"id_district" json:"id_district"`
+	IDCanton   string `db:"id_canton" json:"id_canton"`
+	Province   string `db:"province" json:"province"`
+	District   string `db:"district" json:"district"`
+	Canton     string `db:"canton" json:"canton"`
 }
 
 func (l *Location) Save() error {

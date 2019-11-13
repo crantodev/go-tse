@@ -16,5 +16,7 @@ vendor/
 
 # System files
 .DS_Store
+temp/
+.tmp/
 
 padron_completo.zip

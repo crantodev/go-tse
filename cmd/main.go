@@ -1,62 +1,69 @@
 package main
 
 import (
+	"bufio"
+	"encoding/csv"
 	"fmt"
+	"os"
 
-	"padron/internal/service/handler/download"
+	"padron/internal/model/location"
+	"padron/internal/model/person"
 )
 
 const (
-	fullURL = "https://www.tse.go.cr/zip/padron/padron_completo.zip"
+	fullURL          = "https://www.tse.go.cr/zip/padron/padron_completo.zip"
+	zipFilename      = "padron_completo.zip"
+	tempFolder       = "./temp"
+	locationFilename = "Distelec.txt"
+	peopleFilename   = "PADRON_COMPLETO.txt"
 )
 
 func main() {
 
-	fmt.Println("Download Started")
+	// if !file.Exists(zipFilename) {
+	// 	fmt.Println("Download Started")
 
-	err := download.File("padron_completo.zip", fullURL)
+	// 	err := file.Download(zipFilename, fullURL)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+
+	// 	fmt.Println("Download Finished")
+	// }
+
+	// fmt.Println("Extracting Zip file")
+	// _, err := file.Unzip(zipFilename, tempFolder)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	locationFile, err := os.Open(fmt.Sprintf("%s/%s", tempFolder, locationFilename))
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Download Finished")
-	// distelecFile, _ := os.Open("Distelec.txt")
-	// distelectReader := csv.NewReader(bufio.NewReader(distelecFile))
+	defer locationFile.Close()
 
-	// defer distelecFile.Close()
+	r := csv.NewReader(bufio.NewReader(locationFile))
 
-	// locations, err := models.Parser(distelectReader)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	_, err = location.Parser(r)
+	if err != nil {
+		panic(fmt.Errorf("Locations could not be parsed %v", err))
+	}
 
-	// fmt.Println(locations[1].IDSplitter())
+	peopleFile, err := os.Open(fmt.Sprintf("%s/%s", tempFolder, peopleFilename))
+	if err != nil {
+		panic(err)
+	}
 
-	// padronReader, _ := parser.Reader("padron.txt")
+	defer peopleFile.Close()
 
-	// var people []models.Person
+	r = csv.NewReader(bufio.NewReader(peopleFile))
 
-	// for {
-	// 	record, err := padronReader.Read()
-	// 	if err == io.EOF {
-	// 		break
-	// 	}
+	people, err := person.Parser(r)
+	if err != nil {
+		panic(fmt.Errorf("People could not be parsed %v", err))
+	}
 
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-
-	// 	people = append(people, models.Person{
-	// 		ID:         record[0],
-	// 		Location:   record[1],
-	// 		Gender:     record[2],
-	// 		DueDate:    record[3],
-	// 		Vote:       record[4],
-	// 		FirstName:  strings.TrimSpace(record[5]),
-	// 		MiddleName: strings.TrimSpace(record[6]),
-	// 		LastName:   strings.TrimSpace(record[7]),
-	// 	})
-	// }
-
-	// fmt.Println(people[2])
+	fmt.Println(people[0])
 }
