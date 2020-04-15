@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Parser get the CSV content and creates the person struct
 func Parser(reader *csv.Reader) ([]Person, error) {
 	var people []Person
 

@@ -5,9 +5,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-
 	"padron/internal/model/location"
 	"padron/internal/model/person"
+	"padron/internal/service/handler/file"
 )
 
 const (
@@ -19,51 +19,50 @@ const (
 )
 
 func main() {
+	var sf string = fmt.Sprintf("%s/%s", tempFolder, zipFilename)
 
-	// if !file.Exists(zipFilename) {
-	// 	fmt.Println("Download Started")
+	if !file.Exists(sf) {
+		if err := file.Download(sf, fullURL); err != nil {
+			panic(err)
+		}
+	}
 
-	// 	err := file.Download(zipFilename, fullURL)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
+	var lf string = fmt.Sprintf("%s/%s", tempFolder, locationFilename)
+	var pf string = fmt.Sprintf("%s/%s", tempFolder, peopleFilename)
 
-	// 	fmt.Println("Download Finished")
-	// }
+	if !file.Exists(lf) || !file.Exists(pf) {
+		fmt.Println("Extracting Zip file")
+		_, err := file.Unzip(sf, tempFolder)
+		if err != nil {
+			panic(err)
+		}
+	}
 
-	// fmt.Println("Extracting Zip file")
-	// _, err := file.Unzip(zipFilename, tempFolder)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	locationFile, err := os.Open(fmt.Sprintf("%s/%s", tempFolder, locationFilename))
+	file, err := os.Open(lf)
 	if err != nil {
 		panic(err)
 	}
 
-	defer locationFile.Close()
+	lfr := csv.NewReader(bufio.NewReader(file))
+	defer file.Close()
 
-	r := csv.NewReader(bufio.NewReader(locationFile))
-
-	_, err = location.Parser(r)
-	if err != nil {
-		panic(fmt.Errorf("Locations could not be parsed %v", err))
-	}
-
-	peopleFile, err := os.Open(fmt.Sprintf("%s/%s", tempFolder, peopleFilename))
+	locations, err := location.Parser(lfr)
 	if err != nil {
 		panic(err)
 	}
 
-	defer peopleFile.Close()
-
-	r = csv.NewReader(bufio.NewReader(peopleFile))
-
-	people, err := person.Parser(r)
+	file, err = os.Open(pf)
 	if err != nil {
-		panic(fmt.Errorf("People could not be parsed %v", err))
+		panic(err)
 	}
 
-	fmt.Println(people[0])
+	pfr := csv.NewReader(bufio.NewReader(file))
+
+	people, err := person.Parser(pfr)
+	if err != nil {
+		panic(err)
+	}
+
+	// Process parsed data
+	fmt.Println(locations[0], people[0])
 }

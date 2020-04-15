@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Parser get the CSV content and creates the location struct
 func Parser(reader *csv.Reader) ([]Location, error) {
 	var locations []Location
 
