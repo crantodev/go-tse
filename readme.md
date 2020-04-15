@@ -1,0 +1,1 @@
+# Simple golang script that download and parse the list of Costa Rican citizen from TSE
